@@ -8,7 +8,6 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // middleware
-
 app.use(cors());
 app.use(express.json());
 
@@ -24,6 +23,7 @@ async function run() {
     await client.connect();
     const database = client.db("tourRanger");
     const packageCollection = database.collection("packages");
+    const bookingCollection = database.collection("booking");
 
     //Get API
     app.get("/packages", async (req, res) => {
@@ -34,6 +34,7 @@ async function run() {
 
     //Dynamic API
     app.get("/packages/:id", async (req, res) => {
+      const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const package = await packageCollection.findOne(query);
       res.json(package);
@@ -44,6 +45,21 @@ async function run() {
       const package = req.body;
       const result = await packageCollection.insertOne(package);
       res.json(result);
+    });
+
+    //Booking Post API
+    app.post("/packages/booking", async (req, res) => {
+      const booking = req.body;
+      booking.status = "pending";
+      const result = await bookingCollection.insertOne(booking);
+      res.json(result);
+    });
+
+    //Orders Get API
+    app.get("/orders", async (req, res) => {
+      const cursor = bookingCollection.find({});
+      const booking = await cursor.toArray();
+      res.send(booking);
     });
   } finally {
     // await client.close();
