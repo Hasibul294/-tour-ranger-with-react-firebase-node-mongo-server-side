@@ -55,11 +55,28 @@ async function run() {
       res.json(result);
     });
 
+    //User Order Get API
+    app.get("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { email: id };
+      // console.log("email", id);
+      const result = await bookingCollection.find(query).toArray();
+      res.send(result);
+    });
+
     //Orders Get API
     app.get("/orders", async (req, res) => {
       const cursor = bookingCollection.find({});
       const booking = await cursor.toArray();
       res.send(booking);
+    });
+
+    //Delete API
+    app.delete("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await bookingCollection.deleteOne(query);
+      res.json(result);
     });
   } finally {
     // await client.close();
