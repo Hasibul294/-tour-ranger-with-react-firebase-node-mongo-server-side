@@ -59,7 +59,6 @@ async function run() {
     app.get("/orders/:id", async (req, res) => {
       const id = req.params.id;
       const query = { email: id };
-      // console.log("email", id);
       const result = await bookingCollection.find(query).toArray();
       res.send(result);
     });
@@ -69,6 +68,25 @@ async function run() {
       const cursor = bookingCollection.find({});
       const booking = await cursor.toArray();
       res.send(booking);
+    });
+
+    //Update API
+    app.put("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          status: "confirm",
+        },
+      };
+      const result = await bookingCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      console.log(result);
+      res.json(result);
     });
 
     //Delete API
